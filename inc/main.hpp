@@ -8,7 +8,7 @@
 #include <mqtt/async_client.h>
 
 
-const std::string SERVER_ADDRESS = "tcp://25.34.193.58:1883";
+const std::string SERVER_ADDRESS = "tcp://25.36.223.4:1883";
 const std::string CLIENT_ID = "test_sub";
 const std::string TOPIC = "weathert/c1";
 const int READER_THREADS_COUNT = 12;
