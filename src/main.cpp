@@ -51,7 +51,7 @@ int main() {
 
     struct mq_attr attr_mqtt;
     attr_mqtt.mq_maxmsg = 10;
-    attr_mqtt.mq_msgsize = 8192;
+    attr_mqtt.mq_msgsize = 131072;
     
     mqtt_grid_queue = mq_open("/mqtt_grid_queue", O_CREAT | O_RDWR, 0666, &attr_mqtt);
     if (mqtt_grid_queue == (mqd_t)-1) {
@@ -84,7 +84,7 @@ int main() {
 
     struct mq_attr attr_influx_queue;
     attr_influx_queue.mq_maxmsg = 10;
-    attr_influx_queue.mq_msgsize = 8192;
+    attr_influx_queue.mq_msgsize = 131072;
 
     influx_queue = mq_open("/influx_queue", O_CREAT | O_RDWR, 0666, &attr_influx_queue);
     if (influx_queue == (mqd_t)-1) {
