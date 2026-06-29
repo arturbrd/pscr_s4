@@ -24,10 +24,12 @@ class MqttCallback : public virtual mqtt::callback {
             std::cout << "Topic: " << msg->get_topic() << std::endl;
             std::cout << "Message: " << msg_string << std::endl;
             if (topic == "station/c3/grid/raw") {
-                if (mq_send(mqtt_grid_queue, msg_string.c_str(), msg_string.size() + 1, 0) == -1) {
+                std::string* payload = new std::string(std::move(msg_string));
+                if (mq_send(mqtt_grid_queue, reinterpret_cast<const char*>(&payload), sizeof(payload), 0) == -1) {
                     std::cerr << "Error: Couldn't send msg to queue" << std::endl;
                     std::cerr << "mq_send errno: " << errno 
                             << " (" << strerror(errno) << ")" << std::endl;
+                    delete payload;
                 }
             } else if (topic == "weather/raw") {
                 if (mq_send(mqtt_weather_raw_queue, msg_string.c_str(), msg_string.size() + 1, 0) == -1) {
@@ -57,7 +59,7 @@ int main() {
 
     struct mq_attr attr_mqtt;
     attr_mqtt.mq_maxmsg = 10;
-    attr_mqtt.mq_msgsize = 131072;
+    attr_mqtt.mq_msgsize = 4096;
     
     mqtt_grid_queue = mq_open("/mqtt_grid_queue", O_CREAT | O_RDWR, 0666, &attr_mqtt);
     if (mqtt_grid_queue == (mqd_t)-1) {

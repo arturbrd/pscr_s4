@@ -185,21 +185,87 @@ long find_nearest(long ts) {
 
 
 void* grid_thread_func(void* arg) {
-    while(1) {
+    std::cout << "Hello from grid_thread\n";
+    while (1) {
+        std::string* payload = nullptr;
 
+        ssize_t bytes = mq_receive(
+            mqtt_grid_queue,
+            reinterpret_cast<char*>(&payload),
+            sizeof(payload),
+            nullptr
+        );
+
+        if (bytes == -1) {
+            std::cerr << "grid mq_receive error: "
+                      << strerror(errno) << std::endl;
+            continue;
+        }
+
+        if (payload == nullptr) continue;
+
+        std::string data = std::move(*payload);
+        delete payload;
+
+        // TODO: twoja logika
+        std::cout << "[GRID] " << data << std::endl;
     }
+    return nullptr;
 }
 
 void* weather_avg_thread_func(void* arg) {
-    while(1) {
-        
+    char buffer[1024];
+    std::cout << "Hello from weather_avg_thread\n";
+
+    while (1) {
+        ssize_t bytes = mq_receive(
+            mqtt_weather_avg_queue,
+            buffer,
+            sizeof(buffer),
+            nullptr
+        );
+
+        if (bytes == -1) {
+            std::cerr << "weather_avg mq_receive error: "
+                      << strerror(errno) << std::endl;
+            continue;
+        }
+
+        std::string data(buffer, bytes);
+
+        std::cout << "[AVG] " << data << std::endl;
+
+        // TODO: logika
     }
+    return nullptr;
 }
 
 void* weather_raw_thread_func(void* arg) {
-    while(1) {
-        
+    char buffer[4096];
+    std::cout << "Hello from weather_raw_thread\n";
+
+    while (1) {
+        ssize_t bytes = mq_receive(
+            mqtt_weather_raw_queue,
+            buffer,
+            sizeof(buffer),
+            nullptr
+        );
+
+        if (bytes == -1) {
+            std::cerr << "weather_raw mq_receive error: "
+                      << strerror(errno) << std::endl;
+            continue;
+        }
+
+        json j = json::parse(buffer);
+        Data d = j.get<Data>();
+
+        std::cout << "[RAW] " << d << std::endl;
+
+        // TODO: logika
     }
+    return nullptr;
 }
 
 void* influx_thread_func(void* arg) {
