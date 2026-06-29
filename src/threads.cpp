@@ -2,6 +2,7 @@
 #include <iostream>
 #include "threads.hpp"
 #include "weather.hpp"
+#include "grid.hpp"
 
 using json = nlohmann::json;
 
@@ -207,8 +208,21 @@ void* grid_thread_func(void* arg) {
         std::string data = std::move(*payload);
         delete payload;
 
+        auto j = nlohmann::json::parse(data);
+        GridMessage msg = j.get<GridMessage>();
+
+        std::string batch;
+
+        for (const auto& e : msg.flow) {
+            batch += "grid_flow,section=" + e.section_code +
+                     " value=" + std::to_string(e.value) +
+                     " " + e.dtime + "\n";
+        }
+
+        mq_send(influx_queue, batch.c_str(), batch.size(), 0);
+
         // TODO: twoja logika
-        std::cout << "[GRID] " << data << std::endl;
+        std::cout << "[GRID] " << msg << std::endl;
     }
     return nullptr;
 }
@@ -231,9 +245,10 @@ void* weather_avg_thread_func(void* arg) {
             continue;
         }
 
-        std::string data(buffer, bytes);
+        auto j = nlohmann::json::parse(buffer);
+        AverageMsg msg = j.get<AverageMsg>();
 
-        std::cout << "[AVG] " << data << std::endl;
+        std::cout << "[AVG] " << msg << std::endl;
 
         // TODO: logika
     }

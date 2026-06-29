@@ -13,6 +13,7 @@ add_executable(app.exe
     src/main.cpp
     src/threads.cpp
     src/weather.cpp
+    src/grid.cpp
 )
 
 

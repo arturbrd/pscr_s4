@@ -14,12 +14,16 @@ struct Record {
     int valid;
 };
 
+std::string to_influx(const Record& r);
+
 struct Data {
     int task_id;
     long timestamp;
     int count;
     std::vector<Record> records;
 };
+
+std::string to_influx(const Data& d);
 
 struct WeatherMap {
     long timestamp;
@@ -32,6 +36,8 @@ struct AverageMsg {
     double average_wind_mps;
     double average_cloud_pct;
 };
+
+std::string to_influx(const AverageMsg& a);
 
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Record,
     point_id, lat, lon, temp_c, wind_mps,

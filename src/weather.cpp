@@ -1,6 +1,6 @@
 #include "weather.hpp"
 #include <ostream>
-
+#include <string>
 
 std::ostream& operator<<(std::ostream& os, const Record& r) {
     return os << "Record{"
@@ -26,4 +26,35 @@ std::ostream& operator<<(std::ostream& os, const Data& d) {
     }
 
     return os << "] }";
+}
+
+std::string to_influx(const Record& r) {
+    return "weather_raw,point_id=" + std::to_string(r.point_id) +
+           " lat=" + std::to_string(r.lat) +
+           ",lon=" + std::to_string(r.lon) +
+           ",temp_c=" + std::to_string(r.temp_c) +
+           ",wind_mps=" + std::to_string(r.wind_mps) +
+           ",clouds_pct=" + std::to_string(r.clouds_pct) +
+           ",valid=" + std::to_string(r.valid) +
+           ",timestamp=" + std::to_string(r.timestamp);
+}
+
+std::string to_influx(const Data& d) {
+    std::string out;
+    out.reserve(d.records.size() * 128);
+
+    for (const auto& r : d.records) {
+        out += to_influx(r);
+        out += "\n";
+    }
+
+    return out;
+}
+
+std::string to_influx(const AverageMsg& a) {
+    return "weather_avg "
+           "average_temp_c=" + std::to_string(a.average_temp_c) +
+           ",average_wind_mps=" + std::to_string(a.average_wind_mps) +
+           ",average_cloud_pct=" + std::to_string(a.average_cloud_pct) +
+           " " + std::to_string(a.timestamp);
 }
