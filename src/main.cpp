@@ -92,11 +92,11 @@ int main() {
 
     struct mq_attr attr_influx_queue;
     attr_influx_queue.mq_maxmsg = 10;
-    attr_influx_queue.mq_msgsize = 131072;
+    attr_influx_queue.mq_msgsize = 1024;
 
     influx_queue = mq_open("/influx_queue", O_CREAT | O_RDWR, 0666, &attr_influx_queue);
     if (influx_queue == (mqd_t)-1) {
-        std::cerr << "Error: Couldn't open queue /ready_map_queue" << std::endl
+        std::cerr << "Error: Couldn't open queue /influx_queue" << std::endl
                     << strerror(errno) << std::endl;
         return 1;
     }
