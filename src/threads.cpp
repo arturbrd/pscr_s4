@@ -184,6 +184,6 @@ void* influx_thread_func(void* arg) {
         std::string data = std::move(*payload);
         delete payload;
 
-        influx.write(data));
+        influx.write(data);
     }
 }
