@@ -3,7 +3,7 @@
 #include "threads.hpp"
 #include "weather.hpp"
 #include "grid.hpp"
-#include <curl/curl.h>
+#include "influx.hpp"
 
 using json = nlohmann::json;
 
