@@ -28,6 +28,18 @@ std::ostream& operator<<(std::ostream& os, const Data& d) {
     return os << "] }";
 }
 
+std::ostream& operator<<(std::ostream& os, const AverageMsg& r)
+{
+    os << "AverageMsg{"
+       << "timestamp=" << r.timestamp
+       << ", temp=" << r.average_temp_c
+       << ", wind=" << r.average_wind_mps
+       << ", clouds=" << r.average_cloud_pct
+       << "}";
+
+    return os;
+}
+
 std::string to_influx(const Record& r) {
     return "weather_raw,point_id=" + std::to_string(r.point_id) +
            " lat=" + std::to_string(r.lat) +
