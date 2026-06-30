@@ -50,37 +50,23 @@ void* grid_thread_func(void* arg) {
         delete payload;
 
         auto j = nlohmann::json::parse(data);
-        GridMessage msg = j.get<GridMessage>();
+        GridRawMessage msg = j.get<GridRawMessage>();
 
-        std::string batch;
+        std::string batch[3];
 
-        for (const auto& e : msg.flow) {
-            std::tm tm{};
-            std::istringstream ss(e.dtime);
-            ss >> std::get_time(&tm, "%Y-%m-%d %H:%M:%S");
+        batch[0] = to_influx(msg.cost);
+        batch[1] = to_influx(msg.flow);
+        batch[2] = to_influx(msg.unbalanced);
+        for (int i = 0; i < 3; i++) {
+            std::string* influx_payload = new std::string(std::move(batch[i]));
 
-            auto tp = std::chrono::system_clock::from_time_t(std::mktime(&tm));
-            auto ns = std::chrono::duration_cast<std::chrono::nanoseconds>(
-                tp.time_since_epoch()).count();
-
-            batch += "grid_flow,section=" + e.section_code +
-                    " value=" + std::to_string(e.value) +
-                    " " + std::to_string(ns) + "\n";
+            if (mq_send(influx_queue, reinterpret_cast<const char*>(&influx_payload), sizeof(std::string*), 0) == -1) {
+                std::cerr << "Error: Couldn't send msg to queue" << std::endl;
+                std::cerr << "mq_send errno: " << errno 
+                        << " (" << strerror(errno) << ")" << std::endl;
+                delete influx_payload;
+            }
         }
-
-        // std::cout << "[GRID] " << batch << std::endl;
-
-        std::string* influx_payload = new std::string(std::move(batch));
-
-        if (mq_send(influx_queue, reinterpret_cast<const char*>(&influx_payload), sizeof(std::string*), 0) == -1) {
-            std::cerr << "Error: Couldn't send msg to queue" << std::endl;
-            std::cerr << "mq_send errno: " << errno 
-                    << " (" << strerror(errno) << ")" << std::endl;
-            delete influx_payload;
-        }
-
-        // TODO: twoja logika
-        // std::cout << "[GRID] " << msg << std::endl;
     }
     return nullptr;
 }
