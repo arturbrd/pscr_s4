@@ -60,7 +60,11 @@ void* grid_thread_func(void* arg) {
                      " " + e.dtime + "\n";
         }
 
-        mq_send(influx_queue, batch.c_str(), batch.size(), 0);
+        if (mq_send(influx_queue, batch.c_str(), batch.size(), 0) == -1) {
+            std::cerr << "Error: Couldn't send msg to queue" << std::endl;
+            std::cerr << "mq_send errno: " << errno 
+                    << " (" << strerror(errno) << ")" << std::endl;
+        }
 
         // TODO: twoja logika
         std::cout << "[GRID] " << msg << std::endl;
@@ -94,12 +98,12 @@ void* weather_avg_thread_func(void* arg) {
         // TODO: logika
         std::string lp = to_influx(msg);
 
-        mq_send(
-            influx_queue,
-            lp.data(),
-            lp.size(),
-            0
-        );
+
+        if (mq_send(influx_queue, lp.data(), lp.size(), 0) == -1) {
+            std::cerr << "Error: Couldn't send msg to queue" << std::endl;
+            std::cerr << "mq_send errno: " << errno 
+                    << " (" << strerror(errno) << ")" << std::endl;
+        }
     }
     return nullptr;
 }
@@ -137,6 +141,12 @@ void* weather_raw_thread_func(void* arg) {
             lp.size(),
             0
         );
+
+        if (mq_send(influx_queue, lp.data(), lp.size(), 0) == -1) {
+            std::cerr << "Error: Couldn't send msg to queue" << std::endl;
+            std::cerr << "mq_send errno: " << errno 
+                    << " (" << strerror(errno) << ")" << std::endl;
+        }
     }
     return nullptr;
 }
