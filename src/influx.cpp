@@ -1,4 +1,6 @@
 #include "influx.hpp"
+#include <iostream>
+#include <stdexcept>
 
 InfluxWriter::InfluxWriter(const std::string& host,
                            const std::string& db,
