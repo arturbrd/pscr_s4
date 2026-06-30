@@ -4,6 +4,7 @@
 #include "weather.hpp"
 #include "grid.hpp"
 #include "influx.hpp"
+#include <cstdlib>
 
 using json = nlohmann::json;
 
@@ -141,10 +142,12 @@ void* weather_raw_thread_func(void* arg) {
 }
 
 void* influx_thread_func(void* arg) {
+    const char* val = std::getenv("INFLUX_TOKEN");
+    std::string token = val ? val : "";
     InfluxWriter influx(
         "http://localhost:8181",
         "weather",
-        "TOKEN");
+        token);
 
     char buffer[16384];
 
