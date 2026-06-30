@@ -44,49 +44,10 @@ struct GridRawMessage {
     UnbalancedMsg unbalanced;
 };
 
-void from_json(const json& j, CostMsg& m) {
-    m.value.clear();
-
-    for (const auto& item : j.at("value")) {
-        m.value.push_back({
-            item.at("cen_cost").get<double>(),
-            item.at("dtime").get<std::string>()
-        });
-    }
-}
-
-void from_json(const json& j, FlowMsg& m) {
-    m.value.clear();
-
-    for (const auto& item : j.at("value")) {
-        m.value.push_back({
-            item.at("dtime").get<std::string>(),
-            item.at("section_code").get<std::string>(),
-            item.at("value").get<double>()
-        });
-    }
-}
-
-
-void from_json(const json& j, UnbalancedMsg& m) {
-    m.value.clear();
-
-    for (const auto& item : j.at("value")) {
-        m.value.push_back({
-            item.at("balance").get<double>(),
-            item.at("dtime").get<std::string>(),
-            item.at("en_d").get<double>(),
-            item.at("en_w").get<double>()
-        });
-    }
-}
-
-
-void from_json(const json& j, GridRawMessage& m) {
-    m.cost = j.at("cost");
-    m.flow = j.at("flow");
-    m.unbalanced = j.at("unbalanced");
-}
+void from_json(const json& j, CostMsg& m);
+void from_json(const json& j, FlowMsg& m);
+void from_json(const json& j, UnbalancedMsg& m);
+void from_json(const json& j, GridRawMessage& m);
 
 std::ostream& operator<<(std::ostream& os, const FlowEntry& e);
 std::ostream& operator<<(std::ostream& os, const FlowMsg& g);
