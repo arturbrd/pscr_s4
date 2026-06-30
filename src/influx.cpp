@@ -23,17 +23,17 @@ InfluxWriter::InfluxWriter(const std::string& host,
     curl_easy_setopt(curl_, CURLOPT_URL, url.c_str());
     curl_easy_setopt(curl_, CURLOPT_HTTPHEADER, headers_);
     curl_easy_setopt(curl_, CURLOPT_VERBOSE, 1L);
-    curl_easy_setopt(curl_, CURLOPT_DEBUGFUNCTION, curl_debug_callback);
+    curl_easy_setopt(curl_, CURLOPT_DEBUGFUNCTION, curl_debug_fn);
     // opcjonalnie
     curl_easy_setopt(curl_, CURLOPT_TCP_KEEPALIVE, 1L);
 }
 
-static int curl_debug_callback(
-    CURL *handle,
+static int curl_debug_fn(
+    CURL*,
     curl_infotype type,
-    char *data,
+    char* data,
     size_t size,
-    void *userptr)
+    void*)
 {
     std::cerr.write(data, size);
     return 0;
