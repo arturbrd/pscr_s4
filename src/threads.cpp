@@ -60,10 +60,13 @@ void* grid_thread_func(void* arg) {
                      " " + e.dtime + "\n";
         }
 
-        if (mq_send(influx_queue, batch.c_str(), batch.size(), 0) == -1) {
+        std::string* influx_payload = new std::string(std::move(batch));
+
+        if (mq_send(influx_queue, influx_payload.c_str(), influx_payload.size(), 0) == -1) {
             std::cerr << "Error: Couldn't send msg to queue" << std::endl;
             std::cerr << "mq_send errno: " << errno 
                     << " (" << strerror(errno) << ")" << std::endl;
+            delete influx_payload;
         }
 
         // TODO: twoja logika
@@ -98,11 +101,13 @@ void* weather_avg_thread_func(void* arg) {
         // TODO: logika
         std::string lp = to_influx(msg);
 
+        std::string* payload = new std::string(std::move(lp));
 
-        if (mq_send(influx_queue, lp.data(), lp.size(), 0) == -1) {
+        if (mq_send(influx_queue, payload.data(), payload.size(), 0) == -1) {
             std::cerr << "Error: Couldn't send msg to queue" << std::endl;
             std::cerr << "mq_send errno: " << errno 
                     << " (" << strerror(errno) << ")" << std::endl;
+            delete payload;
         }
     }
     return nullptr;
@@ -135,17 +140,13 @@ void* weather_raw_thread_func(void* arg) {
 
         std::string lp = to_influx(d);
 
-        mq_send(
-            influx_queue,
-            lp.data(),
-            lp.size(),
-            0
-        );
+        std::string* payload = new std::string(std::move(lp));
 
-        if (mq_send(influx_queue, lp.data(), lp.size(), 0) == -1) {
+        if (mq_send(influx_queue, payload.data(), payload.size(), 0) == -1) {
             std::cerr << "Error: Couldn't send msg to queue" << std::endl;
             std::cerr << "mq_send errno: " << errno 
                     << " (" << strerror(errno) << ")" << std::endl;
+            delete payload;
         }
     }
     return nullptr;
@@ -163,16 +164,26 @@ void* influx_thread_func(void* arg) {
     std::cout << "Hello from influx_thread\n";
     while (true)
     {
+        std::string* payload = nullptr;
+
         ssize_t bytes = mq_receive(
             influx_queue,
             buffer,
             sizeof(buffer),
             nullptr
         );
-        std::cout << "received" << std::endl;
-        if (bytes == -1)
-            continue;
 
-        influx.write(std::string_view(buffer, bytes));
+        if (bytes == -1) {
+            std::cerr << "grid mq_receive error: "
+                      << strerror(errno) << std::endl;
+            continue;
+        }
+
+        if (payload == nullptr) continue;
+
+        std::string data = std::move(*payload);
+        delete payload;
+
+        influx.write(data));
     }
 }
