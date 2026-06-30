@@ -92,7 +92,7 @@ int main() {
 
     struct mq_attr attr_influx_queue;
     attr_influx_queue.mq_maxmsg = 10;
-    attr_influx_queue.mq_msgsize = c;
+    attr_influx_queue.mq_msgsize = 1024;
 
     influx_queue = mq_open("/influx_queue", O_CREAT | O_RDWR, 0666, &attr_influx_queue);
     if (influx_queue == (mqd_t)-1) {
