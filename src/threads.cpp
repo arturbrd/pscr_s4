@@ -251,6 +251,14 @@ void* weather_avg_thread_func(void* arg) {
         std::cout << "[AVG] " << msg << std::endl;
 
         // TODO: logika
+        std::string lp = to_influx(msg);
+
+        mq_send(
+            influx_queue,
+            lp.data(),
+            lp.size(),
+            0
+        );
     }
     return nullptr;
 }
@@ -279,12 +287,41 @@ void* weather_raw_thread_func(void* arg) {
         std::cout << "[RAW] " << d << std::endl;
 
         // TODO: logika
+
+        std::string lp = to_influx(msg);
+
+        mq_send(
+            influx_queue,
+            lp.data(),
+            lp.size(),
+            0
+        );
     }
     return nullptr;
 }
 
 void* influx_thread_func(void* arg) {
-    while(1) {
-        
+    InfluxClient client(...);
+
+    char buffer[16384];
+
+    while (true)
+    {
+        ssize_t bytes = mq_receive(
+            influx_queue,
+            buffer,
+            sizeof(buffer),
+            nullptr
+        );
+
+        if (bytes == -1)
+            continue;
+
+        std::string lp(buffer, bytes);
+
+        if (!client.write(lp))
+        {
+            std::cerr << "Influx write failed\n";
+        }
     }
 }
