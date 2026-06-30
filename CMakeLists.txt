@@ -14,6 +14,7 @@ add_executable(app.exe
     src/threads.cpp
     src/weather.cpp
     src/grid.cpp
+    src/influx.cpp
 )
 
 
