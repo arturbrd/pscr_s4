@@ -190,7 +190,7 @@ void* influx_thread_func(void* arg) {
 
         if (payload == nullptr) continue;
         std::cout << "received" << std::endl;
-        std::string data = std::move(*payload);
+        std::string data = std::move(*((std::string*)buffer));
         delete payload;
 
         influx.write(data);
