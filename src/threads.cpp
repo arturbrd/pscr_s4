@@ -128,7 +128,7 @@ void* weather_raw_thread_func(void* arg) {
 
         // TODO: logika
 
-        std::string lp = to_influx(msg);
+        std::string lp = to_influx(d);
 
         mq_send(
             influx_queue,
