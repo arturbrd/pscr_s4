@@ -64,7 +64,7 @@ void* grid_thread_func(void* arg) {
 
         std::string* influx_payload = new std::string(std::move(batch));
 
-        if (mq_send(influx_queue, reinterpret_cast<const char*>(&influx_payload), sizeof(payload), 0) == -1) {
+        if (mq_send(influx_queue, reinterpret_cast<const char*>(&influx_payload), sizeof(influx_payload), 0) == -1) {
             std::cerr << "Error: Couldn't send msg to queue" << std::endl;
             std::cerr << "mq_send errno: " << errno 
                     << " (" << strerror(errno) << ")" << std::endl;
