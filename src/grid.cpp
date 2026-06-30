@@ -19,14 +19,3 @@ std::ostream& operator<<(std::ostream& os, const GridMessage& g) {
     return os << "}";
 }
 
-inline void from_json(const nlohmann::json& j, GridMessage& g)
-{
-    g.flow.clear();
-
-    const auto& arr = j.at("flow").at("value");
-
-    for (const auto& item : arr)
-    {
-        g.flow.push_back(item.get<FlowEntry>());
-    }
-}
