@@ -173,7 +173,6 @@ void* influx_thread_func(void* arg) {
     while (true)
     {
         std::cout << "sup" << std::endl;
-        std::string* payload = nullptr;
 
         ssize_t bytes = mq_receive(
             influx_queue,
@@ -188,10 +187,8 @@ void* influx_thread_func(void* arg) {
             continue;
         }
 
-        if (payload == nullptr) continue;
         std::cout << "received" << std::endl;
         std::string data = std::move(*((std::string*)buffer));
-        delete payload;
 
         influx.write(data);
     }
