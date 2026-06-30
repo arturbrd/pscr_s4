@@ -174,13 +174,13 @@ void* influx_thread_func(void* arg) {
         );
 
         if (bytes == -1) {
-            std::cerr << "grid mq_receive error: "
+            std::cerr << "influx_queue error: "
                       << strerror(errno) << std::endl;
             continue;
         }
 
         if (payload == nullptr) continue;
-
+        std::cout << "received" << std::endl;
         std::string data = std::move(*payload);
         delete payload;
 
