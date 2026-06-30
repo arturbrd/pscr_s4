@@ -68,7 +68,7 @@ void* grid_thread_func(void* arg) {
                     " " + std::to_string(ns) + "\n";
         }
 
-        std::cout << "[GRID] " << batch << std::endl;
+        // std::cout << "[GRID] " << batch << std::endl;
 
         std::string* influx_payload = new std::string(std::move(batch));
 
@@ -194,7 +194,7 @@ void* influx_thread_func(void* arg) {
         std::string data = std::move(*payload);
         delete payload;
 
-        std::cout << "Received: " << data << std::endl;
+        // std::cout << "Received: " << data << std::endl;
 
         influx.write(data);
     }
