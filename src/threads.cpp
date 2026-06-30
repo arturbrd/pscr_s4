@@ -60,6 +60,8 @@ void* grid_thread_func(void* arg) {
                      " " + e.dtime + "\n";
         }
 
+        std::cout << "[GRID] " << batch << std::endl;
+
         std::string* influx_payload = new std::string(std::move(batch));
 
         if (mq_send(influx_queue, reinterpret_cast<const char*>(&influx_payload), sizeof(payload), 0) == -1) {
@@ -96,7 +98,7 @@ void* weather_avg_thread_func(void* arg) {
         auto j = nlohmann::json::parse(buffer);
         AverageMsg msg = j.get<AverageMsg>();
 
-        std::cout << "[AVG] " << msg << std::endl;
+        // std::cout << "[AVG] " << msg << std::endl;
 
         // TODO: logika
         std::string lp = to_influx(msg);
@@ -134,7 +136,7 @@ void* weather_raw_thread_func(void* arg) {
         json j = json::parse(buffer);
         Data d = j.get<Data>();
 
-        std::cout << "[RAW] " << d << std::endl;
+        // std::cout << "[RAW] " << d << std::endl;
 
         // TODO: logika
 
