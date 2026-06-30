@@ -4,6 +4,8 @@
 #include <vector>
 #include <nlohmann/json.hpp>
 
+using json = nlohmann::json;
+
 struct CostEntry {
     double cen_cost;
     std::string dtime;

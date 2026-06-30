@@ -21,8 +21,8 @@ class MqttCallback : public virtual mqtt::callback {
         void message_arrived(mqtt::const_message_ptr msg) override {
             std::string msg_string = msg->to_string();
             std::string topic = msg->get_topic();
-            std::cout << "Topic: " << msg->get_topic() << std::endl;
-            std::cout << "Message: " << msg_string << std::endl;
+            // std::cout << "Topic: " << msg->get_topic() << std::endl;
+            // std::cout << "Message: " << msg_string << std::endl;
             if (topic == "station/c3/grid/raw") {
                 std::string* payload = new std::string(std::move(msg_string));
                 if (mq_send(mqtt_grid_queue, reinterpret_cast<const char*>(&payload), sizeof(payload), 0) == -1) {
