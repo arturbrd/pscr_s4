@@ -48,7 +48,7 @@ std::string to_influx(const Record& r) {
            ",wind_mps=" + std::to_string(r.wind_mps) +
            ",clouds_pct=" + std::to_string(r.clouds_pct) +
            ",valid=" + std::to_string(r.valid) +
-           ",timestamp=" + std::to_string(r.timestamp);
+           " " + std::to_string(r.timestamp * 1000000000LL);
 }
 
 std::string to_influx(const Data& d) {
@@ -68,5 +68,5 @@ std::string to_influx(const AverageMsg& a) {
            "average_temp_c=" + std::to_string(a.average_temp_c) +
            ",average_wind_mps=" + std::to_string(a.average_wind_mps) +
            ",average_cloud_pct=" + std::to_string(a.average_cloud_pct) +
-           " " + std::to_string(a.timestamp);
+           " " + std::to_string(a.timestamp * 1000000000LL);
 }
