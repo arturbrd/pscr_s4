@@ -17,8 +17,7 @@ struct GridMessage {
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(FlowEntry,
     dtime, section_code, value)
 
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(GridMessage,
-    flow)
+inline void from_json(const nlohmann::json& j, GridMessage& g);
 
 std::ostream& operator<<(std::ostream& os, const FlowEntry& e);
 std::ostream& operator<<(std::ostream& os, const GridMessage& g);
