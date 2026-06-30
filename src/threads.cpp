@@ -67,6 +67,8 @@ void* grid_thread_func(void* arg) {
             std::cerr << "mq_send errno: " << errno 
                     << " (" << strerror(errno) << ")" << std::endl;
             delete influx_payload;
+        } else {
+            std::cout << "Sent" << std::endl;
         }
 
         // TODO: twoja logika
@@ -108,6 +110,8 @@ void* weather_avg_thread_func(void* arg) {
             std::cerr << "mq_send errno: " << errno 
                     << " (" << strerror(errno) << ")" << std::endl;
             delete payload;
+        } else {
+            std::cout << "Sent" << std::endl;
         }
     }
     return nullptr;
@@ -147,7 +151,10 @@ void* weather_raw_thread_func(void* arg) {
             std::cerr << "mq_send errno: " << errno 
                     << " (" << strerror(errno) << ")" << std::endl;
             delete payload;
+        } else {
+            std::cout << "Sent" << std::endl;
         }
+        
     }
     return nullptr;
 }
