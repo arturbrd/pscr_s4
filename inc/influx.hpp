@@ -1,6 +1,6 @@
 #pragma once
 
-#include <curl/curl.hpp>
+#include <curl/curl.h>
 
 class InfluxWriter {
 public:
