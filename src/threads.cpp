@@ -106,7 +106,6 @@ void* weather_avg_thread_func(void* arg) {
         std::string* payload = new std::string(std::move(lp));
 
         if (mq_send(influx_queue, reinterpret_cast<const char*>(&payload), sizeof(payload), 0) == -1) {
-            std::cout << "kurwa" << std::endl;
             std::cerr << "Error: Couldn't send msg to queue" << std::endl;
             std::cerr << "mq_send errno: " << errno 
                     << " (" << strerror(errno) << ")" << std::endl;
@@ -172,8 +171,6 @@ void* influx_thread_func(void* arg) {
     std::cout << "Hello from influx_thread\n";
     while (true)
     {
-        std::cout << "sup" << std::endl;
-
         ssize_t bytes = mq_receive(
             influx_queue,
             buffer,
@@ -187,8 +184,9 @@ void* influx_thread_func(void* arg) {
             continue;
         }
 
-        std::cout << "received" << std::endl;
+
         std::string data = std::move(*((std::string*)buffer));
+        std::cout << "Received: " << data << std::endl;
 
         influx.write(data);
     }
