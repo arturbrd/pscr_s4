@@ -171,6 +171,7 @@ void* influx_thread_func(void* arg) {
     std::cout << "Hello from influx_thread\n";
     while (true)
     {
+        std::cout << "sup" << std::endl;
         std::string* payload = nullptr;
 
         ssize_t bytes = mq_receive(
