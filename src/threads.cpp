@@ -55,9 +55,17 @@ void* grid_thread_func(void* arg) {
         std::string batch;
 
         for (const auto& e : msg.flow) {
+            std::tm tm{};
+            std::istringstream ss(e.dtime);
+            ss >> std::get_time(&tm, "%Y-%m-%d %H:%M:%S");
+
+            auto tp = std::chrono::system_clock::from_time_t(std::mktime(&tm));
+            auto ns = std::chrono::duration_cast<std::chrono::nanoseconds>(
+                tp.time_since_epoch()).count();
+
             batch += "grid_flow,section=" + e.section_code +
-                     " value=" + std::to_string(e.value) +
-                     " " + e.dtime + "\n";
+                    " value=" + std::to_string(e.value) +
+                    " " + std::to_string(ns) + "\n";
         }
 
         std::cout << "[GRID] " << batch << std::endl;
