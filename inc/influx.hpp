@@ -1,6 +1,7 @@
 #pragma once
 
 #include <curl/curl.h>
+#include <string>
 
 class InfluxWriter {
 public:
