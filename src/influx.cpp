@@ -43,28 +43,54 @@ InfluxWriter::InfluxWriter(const std::string& host,
 
 bool InfluxWriter::write(std::string_view lp)
 {
+    std::string response_body;
+
+    // 🔥 log wysyłanego payloadu
+    std::cerr << "[CURL] sending payload:\n"
+              << lp << "\n";
+
+    // 🔥 odbiór odpowiedzi (body)
+    curl_easy_setopt(curl_, CURLOPT_WRITEFUNCTION,
+        +[](char* ptr, size_t size, size_t nmemb, void* userdata) -> size_t {
+            auto* out = static_cast<std::string*>(userdata);
+            out->append(ptr, size * nmemb);
+            return size * nmemb;
+        });
+
+    curl_easy_setopt(curl_, CURLOPT_WRITEDATA, &response_body);
+
+    // 🔥 request
     curl_easy_setopt(curl_, CURLOPT_POSTFIELDS, lp.data());
     curl_easy_setopt(curl_, CURLOPT_POSTFIELDSIZE, lp.size());
 
     CURLcode res = curl_easy_perform(curl_);
 
+    // 🔥 curl error
     if (res != CURLE_OK)
     {
-        std::cerr << "curl: "
+        std::cerr << "[CURL ERROR] "
                   << curl_easy_strerror(res)
-                  << '\n';
+                  << "\n";
         return false;
     }
 
+    // 🔥 HTTP code
     long response = 0;
-    curl_easy_getinfo(
-        curl_,
-        CURLINFO_RESPONSE_CODE,
-        &response);
+    curl_easy_getinfo(curl_, CURLINFO_RESPONSE_CODE, &response);
 
+    std::cerr << "[CURL] HTTP response: " << response << "\n";
+
+    // 🔥 response body (KLUCZOWE DO DEBUGA INFLUXA)
+    if (!response_body.empty())
+    {
+        std::cerr << "[CURL] response body:\n"
+                  << response_body << "\n";
+    }
+
+    // 🔥 success check
     if (response != 204)
     {
-        std::cerr << "Influx HTTP " << response << '\n';
+        std::cerr << "[INFLUX ERROR] write failed\n";
         return false;
     }
 
