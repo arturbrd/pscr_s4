@@ -149,8 +149,8 @@ void* influx_thread_func(void* arg) {
         "weather",
         token);
 
-    char buffer[16384];
-
+    char buffer[1024];
+    std::cout << "Hello from influx_thread\n";
     while (true)
     {
         ssize_t bytes = mq_receive(
@@ -159,7 +159,7 @@ void* influx_thread_func(void* arg) {
             sizeof(buffer),
             nullptr
         );
-
+        std::cout << "received" << std::endl;
         if (bytes == -1)
             continue;
 
