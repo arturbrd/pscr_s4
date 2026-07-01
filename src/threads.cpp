@@ -28,7 +28,7 @@ long find_nearest(long ts) {
 
 void* grid_thread_func(void* arg) {
     std::cout << "Hello from grid_thread\n";
-    char buffer[65536];
+    char buffer[16384];
     while (1) {
         std::string* payload = nullptr;
 
@@ -143,7 +143,7 @@ void* influx_thread_func(void* arg) {
         "weather",
         token);
 
-    char buffer[65536];
+    char buffer[16384];
     std::cout << "Hello from influx_thread\n";
     while (true)
     {
