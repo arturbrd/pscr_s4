@@ -54,7 +54,7 @@ int main() {
     client.set_callback(mqtt_callback);
 
     struct mq_attr attr_mqtt;
-    attr_mqtt.mq_maxmsg = 20;
+    attr_mqtt.mq_maxmsg = 8;
     attr_mqtt.mq_msgsize = 16384;
     
     mqtt_grid_queue = mq_open("/mqtt_grid_queue", O_CREAT | O_RDWR, 0666, &attr_mqtt);
@@ -65,7 +65,7 @@ int main() {
     }
 
     struct mq_attr attr_mqtt_weather_raw_queue;
-    attr_mqtt_weather_raw_queue.mq_maxmsg = 20;
+    attr_mqtt_weather_raw_queue.mq_maxmsg = 16;
     attr_mqtt_weather_raw_queue.mq_msgsize = 4096;
 
     mqtt_weather_raw_queue = mq_open("/mqtt_weather_raw_queue", O_CREAT | O_RDWR, 0666, &attr_mqtt_weather_raw_queue);
@@ -76,7 +76,7 @@ int main() {
     }
 
     struct mq_attr attr_mqtt_weather_avg_queue;
-    attr_mqtt_weather_avg_queue.mq_maxmsg = 10;
+    attr_mqtt_weather_avg_queue.mq_maxmsg = 8;
     attr_mqtt_weather_avg_queue.mq_msgsize = 1024;
 
     mqtt_weather_avg_queue = mq_open("/mqtt_weather_avg_queue", O_CREAT | O_RDWR, 0666, &attr_mqtt_weather_avg_queue);
@@ -87,7 +87,7 @@ int main() {
     }
 
     struct mq_attr attr_influx_queue;
-    attr_influx_queue.mq_maxmsg = 40;
+    attr_influx_queue.mq_maxmsg = 24;
     attr_influx_queue.mq_msgsize = 16384;
 
     influx_queue = mq_open("/influx_queue", O_CREAT | O_RDWR, 0666, &attr_influx_queue);
