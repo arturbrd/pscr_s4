@@ -52,25 +52,29 @@ void* grid_thread_func(void* arg) {
 
         std::cerr << "[GRID MQ] payload: " << debug_msg << "\n";
 
-        auto j = nlohmann::json::parse(buffer);
-        GridRawMessage msg = j.get<GridRawMessage>();
+        try {
+            auto j = nlohmann::json::parse(buffer);
+            GridRawMessage msg = j.get<GridRawMessage>();
 
-        std::string batch[3];
+            std::string batch[3];
 
-        batch[0] = to_influx(msg.cost);
-        batch[1] = to_influx(msg.flow);
-        batch[2] = to_influx(msg.unbalanced);
-        for (int i = 0; i < 3; i++) {
-            if (batch[i].empty()) {
-                std::cerr << "[WARN] empty Influx line, skipping\n";
-                continue;
+            batch[0] = to_influx(msg.cost);
+            batch[1] = to_influx(msg.flow);
+            batch[2] = to_influx(msg.unbalanced);
+            for (int i = 0; i < 3; i++) {
+                if (batch[i].empty()) {
+                    std::cerr << "[WARN] empty Influx line, skipping\n";
+                    continue;
+                }
+
+                if (mq_send(influx_queue, batch[i].c_str(), batch[i].size(), 0) == -1) {
+                    std::cerr << "Error: Couldn't send msg to queue" << std::endl;
+                    std::cerr << "mq_send errno: " << errno 
+                            << " (" << strerror(errno) << ")" << std::endl;
+                }
             }
-
-            if (mq_send(influx_queue, batch[i].c_str(), batch[i].size(), 0) == -1) {
-                std::cerr << "Error: Couldn't send msg to queue" << std::endl;
-                std::cerr << "mq_send errno: " << errno 
-                        << " (" << strerror(errno) << ")" << std::endl;
-            }
+        } catch (const nlohmann::json::exception& e) {
+            std::cerr << "JSON error: " << e.what() << std::endl;
         }
     }
     return nullptr;
@@ -94,18 +98,18 @@ void* weather_avg_thread_func(void* arg) {
             continue;
         }
 
-        auto j = nlohmann::json::parse(buffer);
-        AverageMsg msg = j.get<AverageMsg>();
+        try {
+            auto j = nlohmann::json::parse(buffer);
+            AverageMsg msg = j.get<AverageMsg>();
 
-        // std::cout << "[AVG] " << msg << std::endl;
+            std::string lp = to_influx(msg);
 
-        // TODO: logika
-        std::string lp = to_influx(msg);
-
-        if (mq_send(influx_queue, lp.c_str(), lp.size(), 0) == -1) {
-            std::cerr << "Error: Couldn't send msg to queue" << std::endl;
-            std::cerr << "mq_send errno: " << errno 
-                    << " (" << strerror(errno) << ")" << std::endl;
+            if (mq_send(influx_queue, lp.c_str(), lp.size(), 0) == -1) {
+                std::cerr << "mq_send error: "
+                        << strerror(errno) << std::endl;
+            }
+        } catch (const nlohmann::json::exception& e) {
+            std::cerr << "JSON error: " << e.what() << std::endl;
         }
     }
     return nullptr;
@@ -129,20 +133,24 @@ void* weather_raw_thread_func(void* arg) {
             continue;
         }
 
-        json j = json::parse(buffer);
-        Data d = j.get<Data>();
+        try {
+            json j = json::parse(buffer);
+            Data d = j.get<Data>();
 
-        // std::cout << "[RAW] " << d << std::endl;
+            // std::cout << "[RAW] " << d << std::endl;
 
-        // TODO: logika
+            // TODO: logika
 
-        std::string lp = to_influx(d);
+            std::string lp = to_influx(d);
 
-        if (mq_send(influx_queue, lp.c_str(), lp.size(), 0) == -1) {
-            std::cerr << "Error: Couldn't send msg to queue" << std::endl;
-            std::cerr << "mq_send errno: " << errno 
-                    << " (" << strerror(errno) << ")" << std::endl;
-        }        
+            if (mq_send(influx_queue, lp.c_str(), lp.size(), 0) == -1) {
+                std::cerr << "Error: Couldn't send msg to queue" << std::endl;
+                std::cerr << "mq_send errno: " << errno 
+                        << " (" << strerror(errno) << ")" << std::endl;
+            }    
+        } catch (const nlohmann::json::exception& e) {
+            std::cerr << "JSON error: " << e.what() << std::endl;
+        }    
     }
     return nullptr;
 }
