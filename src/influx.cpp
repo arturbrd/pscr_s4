@@ -2,17 +2,6 @@
 #include <iostream>
 #include <stdexcept>
 
-static int curl_debug_fn(
-    CURL*,
-    curl_infotype type,
-    char* data,
-    size_t size,
-    void*)
-{
-    std::cerr.write(data, size);
-    return 0;
-}
-
 InfluxWriter::InfluxWriter(const std::string& host,
                            const std::string& db,
                            const std::string& token)
@@ -33,8 +22,6 @@ InfluxWriter::InfluxWriter(const std::string& host,
 
     curl_easy_setopt(curl_, CURLOPT_URL, url.c_str());
     curl_easy_setopt(curl_, CURLOPT_HTTPHEADER, headers_);
-    curl_easy_setopt(curl_, CURLOPT_VERBOSE, 1L);
-    curl_easy_setopt(curl_, CURLOPT_DEBUGFUNCTION, curl_debug_fn);
     // opcjonalnie
     curl_easy_setopt(curl_, CURLOPT_TCP_KEEPALIVE, 1L);
 }
