@@ -28,19 +28,19 @@ class MqttCallback : public virtual mqtt::callback {
                     std::cerr << "Error: Couldn't send msg to queue" << std::endl;
                     std::cerr << "mq_send errno: " << errno 
                             << " (" << strerror(errno) << ")" << std::endl;
-                } else std::cout << "Recceived from " << topic <, std::endl;
+                } else std::cout << "Recceived from " << topic << std::endl;
             } else if (topic == "weather/raw") {
                 if (mq_send(mqtt_weather_raw_queue, msg_string.c_str(), msg_string.size(), 0) == -1) {
                     std::cerr << "Error: Couldn't send msg to queue" << std::endl;
                     std::cerr << "mq_send errno: " << errno 
                             << " (" << strerror(errno) << ")" << std::endl;
-                } else std::cout << "Recceived from " << topic <, std::endl;
+                } else std::cout << "Recceived from " << topic << std::endl;
             } else if (topic == "weather/avg") {
                 if (mq_send(mqtt_weather_avg_queue, msg_string.c_str(), msg_string.size(), 0) == -1) {
                     std::cerr << "Error: Couldn't send msg to queue" << std::endl;
                     std::cerr << "mq_send errno: " << errno 
                             << " (" << strerror(errno) << ")" << std::endl;
-                } else std::cout << "Recceived from " << topic <, std::endl;
+                } else std::cout << "Recceived from " << topic << std::endl;
             }
         }
 };
