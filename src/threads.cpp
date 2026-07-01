@@ -94,7 +94,6 @@ void* weather_avg_thread_func(void* arg) {
             std::cerr << "Error: Couldn't send msg to queue" << std::endl;
             std::cerr << "mq_send errno: " << errno 
                     << " (" << strerror(errno) << ")" << std::endl;
-            delete payload;
         }
     }
     return nullptr;
@@ -144,16 +143,14 @@ void* influx_thread_func(void* arg) {
         "weather",
         token);
 
-    char buffer[1024];
+    char buffer[65536];
     std::cout << "Hello from influx_thread\n";
     while (true)
     {
-        std::string* payload = nullptr;
-
         ssize_t bytes = mq_receive(
             influx_queue,
-            reinterpret_cast<char*>(&payload),
-            sizeof(payload),
+            buffer,
+            sizeof(buffer),
             nullptr
         );
 
@@ -162,11 +159,6 @@ void* influx_thread_func(void* arg) {
                       << strerror(errno) << std::endl;
             continue;
         }
-
-        if (payload == nullptr) continue;
-
-        std::string data = std::move(*payload);
-        delete payload;
 
         // std::cout << "Received: " << data << std::endl;
 
