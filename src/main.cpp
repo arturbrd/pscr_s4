@@ -24,12 +24,10 @@ class MqttCallback : public virtual mqtt::callback {
             // std::cout << "Topic: " << msg->get_topic() << std::endl;
             // std::cout << "Message: " << msg_string << std::endl;
             if (topic == "station/c3/grid/raw") {
-                std::string* payload = new std::string(std::move(msg_string));
-                if (mq_send(mqtt_grid_queue, reinterpret_cast<const char*>(&payload), sizeof(payload), 0) == -1) {
+                if (mq_send(mqtt_grid_queue, rmsg_string.c_str(), msg_string.size() + 1, 0) == -1) {
                     std::cerr << "Error: Couldn't send msg to queue" << std::endl;
                     std::cerr << "mq_send errno: " << errno 
                             << " (" << strerror(errno) << ")" << std::endl;
-                    delete payload;
                 }
             } else if (topic == "weather/raw") {
                 if (mq_send(mqtt_weather_raw_queue, msg_string.c_str(), msg_string.size() + 1, 0) == -1) {
@@ -44,8 +42,6 @@ class MqttCallback : public virtual mqtt::callback {
                             << " (" << strerror(errno) << ")" << std::endl;
                 }
             }
-            
-            
         }
 };
 
@@ -58,8 +54,8 @@ int main() {
     client.set_callback(mqtt_callback);
 
     struct mq_attr attr_mqtt;
-    attr_mqtt.mq_maxmsg = 10;
-    attr_mqtt.mq_msgsize = sizeof(std::string*);
+    attr_mqtt.mq_maxmsg = 20;
+    attr_mqtt.mq_msgsize = 65536;
     
     mqtt_grid_queue = mq_open("/mqtt_grid_queue", O_CREAT | O_RDWR, 0666, &attr_mqtt);
     if (mqtt_grid_queue == (mqd_t)-1) {
@@ -69,7 +65,7 @@ int main() {
     }
 
     struct mq_attr attr_mqtt_weather_raw_queue;
-    attr_mqtt_weather_raw_queue.mq_maxmsg = 10;
+    attr_mqtt_weather_raw_queue.mq_maxmsg = 20;
     attr_mqtt_weather_raw_queue.mq_msgsize = 4096;
 
     mqtt_weather_raw_queue = mq_open("/mqtt_weather_raw_queue", O_CREAT | O_RDWR, 0666, &attr_mqtt_weather_raw_queue);
@@ -80,7 +76,7 @@ int main() {
     }
 
     struct mq_attr attr_mqtt_weather_avg_queue;
-    attr_mqtt_weather_avg_queue.mq_maxmsg = 4;
+    attr_mqtt_weather_avg_queue.mq_maxmsg = 10;
     attr_mqtt_weather_avg_queue.mq_msgsize = 1024;
 
     mqtt_weather_avg_queue = mq_open("/mqtt_weather_avg_queue", O_CREAT | O_RDWR, 0666, &attr_mqtt_weather_avg_queue);
@@ -91,8 +87,8 @@ int main() {
     }
 
     struct mq_attr attr_influx_queue;
-    attr_influx_queue.mq_maxmsg = 10;
-    attr_influx_queue.mq_msgsize = sizeof(std::string*);
+    attr_influx_queue.mq_maxmsg = 40;
+    attr_influx_queue.mq_msgsize = 65536;
 
     influx_queue = mq_open("/influx_queue", O_CREAT | O_RDWR, 0666, &attr_influx_queue);
     if (influx_queue == (mqd_t)-1) {

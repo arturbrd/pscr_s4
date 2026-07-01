@@ -28,13 +28,14 @@ long find_nearest(long ts) {
 
 void* grid_thread_func(void* arg) {
     std::cout << "Hello from grid_thread\n";
+    char buffer[65536];
     while (1) {
         std::string* payload = nullptr;
 
         ssize_t bytes = mq_receive(
             mqtt_grid_queue,
-            reinterpret_cast<char*>(&payload),
-            sizeof(payload),
+            buffer,
+            sizeof(buffer),
             nullptr
         );
 
@@ -44,12 +45,7 @@ void* grid_thread_func(void* arg) {
             continue;
         }
 
-        if (payload == nullptr) continue;
-
-        std::string data = std::move(*payload);
-        delete payload;
-
-        auto j = nlohmann::json::parse(data);
+        auto j = nlohmann::json::parse(buffer);
         GridRawMessage msg = j.get<GridRawMessage>();
 
         std::string batch[3];
@@ -58,13 +54,10 @@ void* grid_thread_func(void* arg) {
         batch[1] = to_influx(msg.flow);
         batch[2] = to_influx(msg.unbalanced);
         for (int i = 0; i < 3; i++) {
-            std::string* influx_payload = new std::string(std::move(batch[i]));
-
-            if (mq_send(influx_queue, reinterpret_cast<const char*>(&influx_payload), sizeof(std::string*), 0) == -1) {
+            if (mq_send(influx_queue, batch[i].c_str(), batch[i].size() + 1, 0) == -1) {
                 std::cerr << "Error: Couldn't send msg to queue" << std::endl;
                 std::cerr << "mq_send errno: " << errno 
                         << " (" << strerror(errno) << ")" << std::endl;
-                delete influx_payload;
             }
         }
     }
@@ -97,9 +90,7 @@ void* weather_avg_thread_func(void* arg) {
         // TODO: logika
         std::string lp = to_influx(msg);
 
-        std::string* payload = new std::string(std::move(lp));
-
-        if (mq_send(influx_queue, reinterpret_cast<const char*>(&payload), sizeof(std::string*), 0) == -1) {
+        if (mq_send(influx_queue, lp.c_str(), lp.size() + 1, 0) == -1) {
             std::cerr << "Error: Couldn't send msg to queue" << std::endl;
             std::cerr << "mq_send errno: " << errno 
                     << " (" << strerror(errno) << ")" << std::endl;
@@ -136,13 +127,10 @@ void* weather_raw_thread_func(void* arg) {
 
         std::string lp = to_influx(d);
 
-        std::string* payload = new std::string(std::move(lp));
-
-        if (mq_send(influx_queue, reinterpret_cast<const char*>(&payload), sizeof(std::string*), 0) == -1) {
+        if (mq_send(influx_queue, lp.c_str(), lp.size() + 1, 0) == -1) {
             std::cerr << "Error: Couldn't send msg to queue" << std::endl;
             std::cerr << "mq_send errno: " << errno 
                     << " (" << strerror(errno) << ")" << std::endl;
-            delete payload;
         }        
     }
     return nullptr;
