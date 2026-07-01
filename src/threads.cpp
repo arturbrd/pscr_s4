@@ -162,6 +162,10 @@ void* influx_thread_func(void* arg) {
 
         std::string data(buffer, bytes);
 
+        std::cout << "=== PAYLOAD BEGIN ===\n";
+        std::cout << data;
+        std::cout << "\n=== PAYLOAD END ===" << std::endl;
+
         // std::cout << "Received: " << data << std::endl;
         influx.write(data);
     }
