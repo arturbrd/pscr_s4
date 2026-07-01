@@ -54,6 +54,11 @@ void* grid_thread_func(void* arg) {
         batch[1] = to_influx(msg.flow);
         batch[2] = to_influx(msg.unbalanced);
         for (int i = 0; i < 3; i++) {
+            if (batch[i].empty()) {
+                std::cerr << "[WARN] empty Influx line, skipping\n";
+                continue;
+            }
+            
             if (mq_send(influx_queue, batch[i].c_str(), batch[i].size(), 0) == -1) {
                 std::cerr << "Error: Couldn't send msg to queue" << std::endl;
                 std::cerr << "mq_send errno: " << errno 
