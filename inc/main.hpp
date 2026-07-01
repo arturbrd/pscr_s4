@@ -9,7 +9,7 @@
 
 
 const std::string SERVER_ADDRESS = "tcp://25.36.223.4:1883";
-const std::string CLIENT_ID = "test_sub";
+const std::string CLIENT_ID = "s4";
 const std::string TOPIC = "weathert/c1";
 const int READER_THREADS_COUNT = 12;
 
