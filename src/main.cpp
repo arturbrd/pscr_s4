@@ -87,7 +87,7 @@ int main() {
     }
 
     struct mq_attr attr_influx_queue;
-    attr_influx_queue.mq_maxmsg = 24;
+    attr_influx_queue.mq_maxmsg = 16;
     attr_influx_queue.mq_msgsize = 16384;
 
     influx_queue = mq_open("/influx_queue", O_CREAT | O_RDWR, 0666, &attr_influx_queue);
