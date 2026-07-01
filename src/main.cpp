@@ -55,7 +55,7 @@ int main() {
 
     struct mq_attr attr_mqtt;
     attr_mqtt.mq_maxmsg = 20;
-    attr_mqtt.mq_msgsize = 65536;
+    attr_mqtt.mq_msgsize = 16384;
     
     mqtt_grid_queue = mq_open("/mqtt_grid_queue", O_CREAT | O_RDWR, 0666, &attr_mqtt);
     if (mqtt_grid_queue == (mqd_t)-1) {
