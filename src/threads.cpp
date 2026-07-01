@@ -160,8 +160,9 @@ void* influx_thread_func(void* arg) {
             continue;
         }
 
-        // std::cout << "Received: " << data << std::endl;
+        std::string data(buffer, bytes);
 
+        // std::cout << "Received: " << data << std::endl;
         influx.write(data);
     }
 }
