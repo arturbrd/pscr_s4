@@ -45,6 +45,13 @@ void* grid_thread_func(void* arg) {
             continue;
         }
 
+        std::cerr << "[GRID MQ] received bytes: " << bytes << "\n";
+
+        // bezpieczeństwo: upewnij się że string jest poprawnie zakończony
+        std::string debug_msg(buffer, bytes);
+
+        std::cerr << "[GRID MQ] payload: " << debug_msg << "\n";
+
         auto j = nlohmann::json::parse(buffer);
         GridRawMessage msg = j.get<GridRawMessage>();
 
@@ -58,7 +65,7 @@ void* grid_thread_func(void* arg) {
                 std::cerr << "[WARN] empty Influx line, skipping\n";
                 continue;
             }
-            
+
             if (mq_send(influx_queue, batch[i].c_str(), batch[i].size(), 0) == -1) {
                 std::cerr << "Error: Couldn't send msg to queue" << std::endl;
                 std::cerr << "mq_send errno: " << errno 
