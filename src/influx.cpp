@@ -46,8 +46,8 @@ bool InfluxWriter::write(std::string_view lp)
     std::string response_body;
 
     // 🔥 log wysyłanego payloadu
-    std::cerr << "[CURL] sending payload:\n"
-              << lp << "\n";
+    // std::cerr << "[CURL] sending payload:\n"
+    //           << lp << "\n";
 
     // 🔥 odbiór odpowiedzi (body)
     curl_easy_setopt(curl_, CURLOPT_WRITEFUNCTION,

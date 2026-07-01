@@ -21,26 +21,26 @@ class MqttCallback : public virtual mqtt::callback {
         void message_arrived(mqtt::const_message_ptr msg) override {
             std::string msg_string = msg->to_string();
             std::string topic = msg->get_topic();
-            std::cout << "Topic: " << msg->get_topic() << std::endl;
-            std::cout << "Message: " << msg_string << std::endl;
+            std::cout << "Received from: " << msg->get_topic() << std::endl;
+            // std::cout << "Message: " << msg_string << std::endl;
             if (topic == "station/c3/grid/raw") {
                 if (mq_send(mqtt_grid_queue, msg_string.c_str(), msg_string.size() + 1, 0) == -1) {
                     std::cerr << "Error: Couldn't send msg to queue" << std::endl;
                     std::cerr << "mq_send errno: " << errno 
                             << " (" << strerror(errno) << ")" << std::endl;
-                } else std::cout << "Recceived from " << topic << std::endl;
+                }
             } else if (topic == "weather/raw") {
                 if (mq_send(mqtt_weather_raw_queue, msg_string.c_str(), msg_string.size() + 1, 0) == -1) {
                     std::cerr << "Error: Couldn't send msg to queue" << std::endl;
                     std::cerr << "mq_send errno: " << errno 
                             << " (" << strerror(errno) << ")" << std::endl;
-                } else std::cout << "Recceived from " << topic << std::endl;
+                }
             } else if (topic == "weather/avg") {
                 if (mq_send(mqtt_weather_avg_queue, msg_string.c_str(), msg_string.size() + 1, 0) == -1) {
                     std::cerr << "Error: Couldn't send msg to queue" << std::endl;
                     std::cerr << "mq_send errno: " << errno 
                             << " (" << strerror(errno) << ")" << std::endl;
-                } else std::cout << "Recceived from " << topic << std::endl;
+                }
             }
         }
 };

@@ -45,12 +45,12 @@ void* grid_thread_func(void* arg) {
             continue;
         }
 
-        std::cerr << "[GRID MQ] received bytes: " << bytes << "\n";
+        // std::cerr << "[GRID MQ] received bytes: " << bytes << "\n";
 
         // bezpieczeństwo: upewnij się że string jest poprawnie zakończony
-        std::string debug_msg(buffer, bytes);
+        // std::string debug_msg(buffer, bytes);
 
-        std::cerr << "[GRID MQ] payload: " << debug_msg << "\n";
+        // std::cerr << "[GRID MQ] payload: " << debug_msg << "\n";
 
         try {
             auto j = nlohmann::json::parse(buffer);
@@ -182,9 +182,9 @@ void* influx_thread_func(void* arg) {
 
         std::string data(buffer, bytes);
 
-        std::cout << "=== PAYLOAD BEGIN ===\n";
-        std::cout << data;
-        std::cout << "\n=== PAYLOAD END ===" << std::endl;
+        // std::cout << "=== PAYLOAD BEGIN ===\n";
+        // std::cout << data;
+        // std::cout << "\n=== PAYLOAD END ===" << std::endl;
 
         // std::cout << "Received: " << data << std::endl;
         influx.write(data);
